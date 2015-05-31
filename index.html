@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Swiper Playground</title>
+    <link rel="stylesheet" href="swiper.min.css">
+    <meta name="viewport" content="width=device-width">
+</head>
+<body>
+<div class="swiper-container">
+    <div class="swiper-wrapper">
+        <div class="swiper-slide i1" data-label="电饭煲"></div>
+        <div class="swiper-slide i2" data-label="智能手环"></div>
+        <div class="swiper-slide i3" data-label="头戴显示器"></div>
+        <div class="swiper-slide i4" data-label="蓝牙音箱"></div>
+    </div>
+</div>
+<div class="the-label"></div>
+<style>
+    body, html {
+        padding: 0;
+        margin: 0;
+        position: relative;
+        height: 100%;
+    }
+
+    .swiper-container {
+        height: 500px;
+        width: 500px;
+    }
+
+    .swiper-slide {
+        color: #000;
+        text-align: center;
+        width: 200px;
+        height: 200px;
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center center;
+    }
+
+    .swiper-wrapper .i1 {
+        background-image: url(1.png);
+    }
+
+    .swiper-wrapper .i2 {
+        background-image: url(2.png);
+    }
+
+    .swiper-wrapper .i3 {
+        background-image: url(3.png);
+    }
+
+    .swiper-wrapper .i4 {
+        background-image: url(4.png);
+    }
+
+    .swiper-slide-duplicate {
+        visibility: hidden;
+    }
+</style>
+<script src="jquery-1.11.3.min.js"></script>
+<script src="swiper.jquery.min.js"></script>
+<script>
+    var swiper = new Swiper('.swiper-container', {
+        // Must define these
+        loop: true,
+        loopedSlides: 4,  // number of slides
+        slidesPerView: 'auto',
+        virtualTranslate: true,
+        looper: {
+            vh: 0.4,  // 0~1, scale vertically
+            vw: 0.6,  // 0~1, scale horizontally
+            scale: 0.5  // 0~1, scale if slide is far away
+        },
+
+        centeredSlides: true,
+        slideToClickedSlide: true
+    });
+    swiper.on('setTranslate', function (s, transform) {
+        for (var i = 0, length = s.slides.length; i < length; i++) {
+            var slide = s.slides.eq(i);
+            if (slide.hasClass('swiper-slide-duplicate')) continue;
+            var slideSize = s.slidesSizesGrid[i];
+            var offset = (s.width - slideSize) / 2;
+            var ang = (slideSize * i - offset + transform) * 2 * Math.PI / s.params.loopedSlides / slideSize;
+            var x = Math.sin(ang) * slideSize * s.params.looper.vw + offset - slideSize * i;
+            var cos = Math.cos(ang);
+            var y = (cos + 1) * (s.height - slide.height()) * s.params.looper.vh / 2;
+            var scale = 1 - (1 - cos) / 2 * s.params.looper.scale;
+            slide.transform('translate(' + x + 'px, ' + y + 'px)scale(' + scale + ')');
+        }
+    });
+    swiper.slideNext();
+    swiper.on('setTransition', function (s, duration) {
+        s.slides.transition(duration);
+        s.animating = false;
+        if (duration) {
+            $('.the-label').text(swiper.slides.eq(swiper.activeIndex).data('label'));
+        }
+    });
+</script>
+</body>
+</html>
